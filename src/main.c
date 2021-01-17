@@ -10,8 +10,12 @@
 
 void delay_ms(uint16_t);
 
+/*
+ * Send a command to the LCD
+ */
 void send_cmd(unsigned char cmd)
 {
+    // Set RS to LOW when sending a command or instruction
     CTL &= ~(1 << RS);
 
     LCD = (LCD & 0x0F) | (cmd & 0xF0);
@@ -25,8 +29,12 @@ void send_cmd(unsigned char cmd)
     CTL &= ~(1 << EN);
 }
 
+/*
+ * Send a byte to the LCD
+ */
 void send_byte(unsigned char byte)
 {
+    // Set RS to HIGH when sending data 
     CTL |= (1 << RS);
 
     LCD = (LCD & 0x0F) | (byte & 0xF0);
@@ -40,6 +48,9 @@ void send_byte(unsigned char byte)
     CTL &= ~(1 << EN);
 }
 
+/*
+ * Send a string of bytes to the LCD
+ */
 void send_str(const char *s)
 {
     while (*s) {
@@ -48,6 +59,20 @@ void send_str(const char *s)
     _delay_us(40);
 }
 
+/*
+ * This program demonstrates the communication with 
+ * a Y1602A LCD from an ATmega2560.
+ * The program assumes that the 4 high pins of port 
+ * PORTB are used to communicate data to the LCD and 
+ * pins PH5 and PH6 of PORTH are used to send commands
+ * to the LCD.
+ * The program also asserts that 4-bit data transfer
+ * mode is used to communicate with the LCD.
+ * The timings are obtained from the Y1602A sheet. Of
+ * note, the cycle time the E pin on the LCD is just
+ * above 1000 ns (1 ms), which justifies the timing
+ * used in this program.
+ */
 int main(void)
 {
     // Set PB4..PB7 as output
